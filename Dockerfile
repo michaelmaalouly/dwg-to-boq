@@ -1,11 +1,12 @@
 FROM python:3.12-slim
 
-# Install build tools, compile LibreDWG, then clean up
+# Install build tools, compile LibreDWG (pinned to stable tag), then clean up
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential cmake git \
-    && git clone --depth 1 https://github.com/LibreDWG/libredwg.git /tmp/libredwg \
+    && git clone --branch 0.13.3 --depth 1 https://github.com/LibreDWG/libredwg.git /tmp/libredwg \
     && cd /tmp/libredwg && mkdir build && cd build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DCMAKE_C_FLAGS="-Wno-array-bounds -Wno-error" \
     && make -j$(nproc) \
     && make install \
     && ldconfig \
