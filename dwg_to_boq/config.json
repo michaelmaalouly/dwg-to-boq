@@ -1,0 +1,199 @@
+{
+  "dwg2dxf_path": "/tmp/libredwg/programs/dwg2dxf",
+
+  "layer_discipline_map": {
+    "ELECTRICAL": [
+      "lighting", "LIGHT", "POWER", "ELEC", "DATA", "CCTV", "TV",
+      "PUBLIC ADDRESS", "CABLE TRAY", "E-LIGHT", "E-FIRE", "E-DATA",
+      "E-CCTV", "E-PHONE", "E-POWER", "E-PWR", "_ELEC", "NURSE CALL",
+      "ACCESS CONTROL", "SMATV", "PA"
+    ],
+    "PLUMBING": [
+      "WATER SUPPLY", "SEWERAGE", "RAIN WATER", "PLUMBING", "Sanit",
+      "DRAINAGE", "BMED-SANITARY", "HOT WATER", "COLD WATER"
+    ],
+    "HVAC": [
+      "HVAC", "DUCT", "GRILLE", "DVM", "FCU", "VENT", "M-Duct",
+      "M-Flex", "M-Term", "M-Eqpm", "M-Devc", "H-SUPPLY", "H-FLEXIBLE",
+      "H-GRILLE", "H-HIDDEN", "H-VOLUME", "MVENT", "York",
+      "DVM_INDOOR", "DVM_OUTDOOR", "DVM_PIPE", "Extractor Fan",
+      "Exhaust Fan", "M-HVAC"
+    ],
+    "FIRE_FIGHTING": [
+      "FIRE HOSE", "FIRE FIGHTING", "Landing Valve", "SPRINKLER",
+      "FIRE_FIGHT", "FF-"
+    ]
+  },
+
+  "block_catalog": {
+    "ELECTRICAL": {
+      "Lighting Fixtures": {
+        "blocks": ["9W", "18W", "48W", "100W", "MHL400", "2x18W", "2x36W",
+                    "4x18W", "2x48W", "LED", "Downlight", "Spotlight",
+                    "Emergency Light", "Exit Light", "EXIT LIGHT"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Cable Trays": {
+        "blocks": ["Cable Tray", "CABLE TRAY", "CT-"],
+        "unit": "M",
+        "description_prefix": "Supply and install"
+      },
+      "Wiring Devices": {
+        "blocks": ["Single Switch", "Double Switch", "Dimmer",
+                    "1 Gang Switch", "2 Gang Switch", "3 Gang Switch",
+                    "4 Gang Switch"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Power Outlets": {
+        "blocks": ["Power Single Socket", "Power Double Socket",
+                    "UPS single Socket", "UPS Single Socket",
+                    "UPS double Socket", "UPS S D", "SO D",
+                    "Socket Outlet", "AC socket",
+                    "13A Socket", "15A Socket", "20A Socket"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Data Communication": {
+        "blocks": ["Data Socket", "Data Outlet", "DATA", "RJ45",
+                    "Telephone Socket", "TEL"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Fire Alarm System": {
+        "blocks": ["OPTICAL SMOKE DETECTOR", "Smoke Detector",
+                    "Heat Detector", "MANUAL STATION", "Manual Call Point",
+                    "STROBE LIGHT WITH ALARM", "Strobe Light",
+                    "Fire Alarm Panel", "Flame Detector",
+                    "Sounder", "Horn"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "CCTV System": {
+        "blocks": ["CCTV", "Camera", "IP Camera", "DVR", "NVR"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Public Address": {
+        "blocks": ["SPEAKER", "SPEAKER.", "Speaker", "Amplifier",
+                    "PA Speaker", "Ceiling Speaker"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Distribution Boards": {
+        "blocks": ["DB-", "MDB", "SMDB", "Panel Board", "Distribution Board",
+                    "ATS", "SDB"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Disconnect Switches": {
+        "blocks": ["Isolator", "Disconnect Switch", "MCB", "MCCB", "RCCB"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      }
+    },
+    "PLUMBING": {
+      "Sanitary Fixtures": {
+        "blocks": ["WC", "WC manta", "WC LT", "Basin", "lav-manta", "Sink",
+                    "Shower", "SHOWER TRAY", "Bath", "Urinal", "Bidet",
+                    "Floor Drain", "FD-1", "Floor Trap", "Cleanout"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Pipes & Fittings": {
+        "blocks": ["PVC", "PPR", "CPVC", "Pipe"],
+        "unit": "M",
+        "description_prefix": "Supply and install"
+      },
+      "Equipment": {
+        "blocks": ["Booster Pump", "Water Heater", "Water Tank",
+                    "Pump", "UV System", "Grease Trap"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      }
+    },
+    "HVAC": {
+      "AC Units": {
+        "blocks": ["YORK Hi-wall", "YORK Floor Standing", "Hi-Wall",
+                    "Floor Standing", "Standing", "Cassette", "Ducted",
+                    "Multi Split Outdoor", "Multi Split Indoor",
+                    "VRF Outdoor", "VRF Indoor", "Split Unit",
+                    "OD_C_S_S1_T", "FCU"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Diffusers & Grilles": {
+        "blocks": ["ROUNDDIFFUSER", "Diffuser", "Supply Diffuser",
+                    "Return Grille", "Return Air Grille", "Louver",
+                    "Linear Diffuser", "Jet Diffuser", "Exhaust Grille"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Ventilation Equipment": {
+        "blocks": ["Exhaust Fan", "Inline EF", "Wall EF", "Fresh Air Fan",
+                    "AHU", "Air Handling Unit", "FAU", "Rooftop Unit",
+                    "tubular inline fan"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Dampers": {
+        "blocks": ["Volume Damper", "Fire Damper", "Balancing Damper",
+                    "rectangular balancing damper"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      }
+    },
+    "FIRE_FIGHTING": {
+      "Fire Hose Reels": {
+        "blocks": ["Fire Hose Reel", "Hose Reel", "FHR"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Landing Valves": {
+        "blocks": ["Landing Valve", "LV"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      },
+      "Sprinklers": {
+        "blocks": ["Sprinkler", "Pendant Sprinkler", "Upright Sprinkler",
+                    "Sidewall Sprinkler"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Fire Extinguishers": {
+        "blocks": ["Fire Extinguisher", "CO2 Extinguisher",
+                    "Dry Powder Extinguisher"],
+        "unit": "NR",
+        "description_prefix": "Supply and install"
+      },
+      "Fire Fighting Equipment": {
+        "blocks": ["Breeching Inlet", "Zone Valve", "Flow Switch",
+                    "Alarm Valve", "Fire Pump", "Jockey Pump",
+                    "Siamese Connection"],
+        "unit": "NR",
+        "description_prefix": "Supply, install, test and commission"
+      }
+    }
+  },
+
+  "unit_inference": {
+    "LINE": "M",
+    "LWPOLYLINE": "M",
+    "ARC": "M",
+    "CIRCLE": "NR",
+    "INSERT": "NR",
+    "MTEXT": null,
+    "TEXT": null,
+    "HATCH": "M2",
+    "DIMENSION": null
+  },
+
+  "excel_styles": {
+    "header_fill": "1F4E79",
+    "header_font_color": "FFFFFF",
+    "element_fill": "D9E2F3",
+    "summary_fill": "FFF2CC",
+    "border_color": "000000"
+  }
+}

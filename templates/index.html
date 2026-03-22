@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DWG to BOQ Converter</title>
+    <style>
+        :root {
+            --primary: #1a56db;
+            --primary-hover: #1e40af;
+            --primary-light: #dbeafe;
+            --success: #059669;
+            --success-light: #d1fae5;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+        .header p {
+            margin-top: 0.5rem;
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card h2 .num {
+            background: var(--primary);
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--gray-50);
+        }
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .drop-zone svg {
+            width: 48px;
+            height: 48px;
+            color: var(--gray-400);
+            margin-bottom: 1rem;
+        }
+        .drop-zone.drag-over svg { color: var(--primary); }
+        .drop-zone p {
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+        .drop-zone .browse {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .drop-zone .hint {
+            font-size: 0.8rem;
+            color: var(--gray-400);
+            margin-top: 0.5rem;
+        }
+
+        /* File list */
+        .file-list {
+            margin-top: 1rem;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+        .file-item .icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .file-item .icon svg {
+            width: 16px;
+            height: 16px;
+            color: var(--primary);
+        }
+        .file-item .name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--gray-700);
+        }
+        .file-item .size {
+            color: var(--gray-400);
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .file-item .remove {
+            background: none;
+            border: none;
+            color: var(--gray-400);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .file-item .remove:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* Input field */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 0.4rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--gray-800);
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+        }
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-success:hover { background: #047857; }
+        .btn-outline {
+            background: white;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-300);
+        }
+        .btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Progress */
+        .progress-section {
+            display: none;
+        }
+        .progress-section.visible {
+            display: block;
+        }
+        .progress-bar-track {
+            background: var(--gray-200);
+            border-radius: 99px;
+            height: 10px;
+            overflow: hidden;
+            margin: 1rem 0 0.5rem;
+        }
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #1a56db, #3b82f6);
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        .progress-bar-fill.done {
+            background: var(--success);
+        }
+        .progress-bar-fill.error {
+            background: var(--danger);
+        }
+        .progress-step {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+        }
+        .progress-percent {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            float: right;
+        }
+
+        /* Result */
+        .result-section {
+            display: none;
+        }
+        .result-section.visible {
+            display: block;
+        }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .result-card {
+            background: var(--gray-50);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+        .result-card .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .result-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-top: 0.25rem;
+        }
+        .result-card.electrical { border-left: 3px solid #f59e0b; }
+        .result-card.plumbing { border-left: 3px solid #3b82f6; }
+        .result-card.hvac { border-left: 3px solid #10b981; }
+        .result-card.fire { border-left: 3px solid #ef4444; }
+
+        .download-area {
+            background: var(--success-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .download-area p {
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Error */
+        .error-box {
+            background: var(--danger-light);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--danger);
+            font-size: 0.9rem;
+            display: none;
+        }
+        .error-box.visible {
+            display: block;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Reset button */
+        .reset-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray-500);
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .reset-link:hover {
+            color: var(--primary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--gray-400);
+            font-size: 0.8rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 0 1rem; margin: 1rem auto; }
+            .card { padding: 1.25rem; }
+            .drop-zone { padding: 2rem 1rem; }
+            .result-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>DWG to BOQ Converter</h1>
+        <p>Convert AutoCAD MEP drawings to Excel Bill of Quantities</p>
+    </div>
+
+    <div class="container">
+        <!-- Upload Section -->
+        <div class="card" id="uploadCard">
+            <h2><span class="num">1</span> Upload DWG Files</h2>
+
+            <div class="drop-zone" id="dropZone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 16V4m0 0L8 8m4-4l4 4" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20 16.7V19a2 2 0 01-2 2H6a2 2 0 01-2-2v-2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <p>Drag & drop DWG files here, or <span class="browse" onclick="document.getElementById('fileInput').click()">browse</span></p>
+                <p class="hint">Supports multiple .dwg files (up to 200MB total)</p>
+            </div>
+            <input type="file" id="fileInput" accept=".dwg" multiple style="display:none">
+
+            <div class="file-list" id="fileList"></div>
+        </div>
+
+        <!-- Config Section -->
+        <div class="card" id="configCard">
+            <h2><span class="num">2</span> Project Details</h2>
+            <div class="form-group">
+                <label for="projectName">Project Name (optional)</label>
+                <input type="text" id="projectName" placeholder="e.g., Maitama Hospital MEP">
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="convertBtn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Convert to BOQ
+                </button>
+                <button class="btn btn-outline" id="clearBtn" style="display:none">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="card progress-section" id="progressSection">
+            <h2><span class="num">3</span> Processing</h2>
+            <div class="progress-bar-track">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <div style="overflow:hidden">
+                <span class="progress-step" id="progressStep">Preparing...</span>
+                <span class="progress-percent" id="progressPercent">0%</span>
+            </div>
+        </div>
+
+        <!-- Error -->
+        <div class="error-box" id="errorBox"></div>
+
+        <!-- Result Section -->
+        <div class="card result-section" id="resultSection">
+            <h2><span class="num">4</span> Results</h2>
+
+            <div class="result-grid" id="resultGrid"></div>
+
+            <div class="download-area">
+                <p>Your BOQ is ready!</p>
+                <button class="btn btn-success" id="downloadBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Download Excel BOQ
+                </button>
+            </div>
+
+            <div class="reset-link" id="resetLink">Convert another set of drawings</div>
+        </div>
+
+        <div class="footer">
+            DWG to BOQ Converter &mdash; Powered by LibreDWG + ezdxf + openpyxl
+        </div>
+    </div>
+
+    <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileList = document.getElementById('fileList');
+    const convertBtn = document.getElementById('convertBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const progressSection = document.getElementById('progressSection');
+    const progressBar = document.getElementById('progressBar');
+    const progressStep = document.getElementById('progressStep');
+    const progressPercent = document.getElementById('progressPercent');
+    const resultSection = document.getElementById('resultSection');
+    const resultGrid = document.getElementById('resultGrid');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const errorBox = document.getElementById('errorBox');
+    const resetLink = document.getElementById('resetLink');
+
+    let selectedFiles = [];
+    let currentJobId = null;
+
+    // Drag & drop
+    ['dragenter', 'dragover'].forEach(e => {
+        dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); });
+    });
+    ['dragleave', 'drop'].forEach(e => {
+        dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); });
+    });
+    dropZone.addEventListener('drop', ev => {
+        const files = [...ev.dataTransfer.files].filter(f => f.name.toLowerCase().endsWith('.dwg'));
+        addFiles(files);
+    });
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+        addFiles([...fileInput.files]);
+        fileInput.value = '';
+    });
+
+    function addFiles(files) {
+        files.forEach(f => {
+            if (!selectedFiles.find(s => s.name === f.name && s.size === f.size)) {
+                selectedFiles.push(f);
+            }
+        });
+        renderFileList();
+    }
+
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        renderFileList();
+    }
+
+    function formatSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+        return (bytes/(1024*1024)).toFixed(1) + ' MB';
+    }
+
+    function renderFileList() {
+        fileList.innerHTML = selectedFiles.map((f, i) => `
+            <div class="file-item">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <path d="M14 2v6h6"/>
+                    </svg>
+                </div>
+                <span class="name">${f.name}</span>
+                <span class="size">${formatSize(f.size)}</span>
+                <button class="remove" onclick="removeFile(${i})" title="Remove">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+        `).join('');
+        convertBtn.disabled = selectedFiles.length === 0;
+        clearBtn.style.display = selectedFiles.length > 0 ? 'inline-flex' : 'none';
+    }
+
+    clearBtn.addEventListener('click', () => {
+        selectedFiles = [];
+        renderFileList();
+    });
+
+    // Convert
+    convertBtn.addEventListener('click', async () => {
+        if (selectedFiles.length === 0) return;
+
+        const projectName = document.getElementById('projectName').value.trim();
+        const formData = new FormData();
+        selectedFiles.forEach(f => formData.append('files', f));
+        formData.append('project_name', projectName);
+
+        // Show progress, hide errors/results
+        progressSection.classList.add('visible');
+        resultSection.classList.remove('visible');
+        errorBox.classList.remove('visible');
+        progressBar.className = 'progress-bar-fill';
+        progressBar.style.width = '0%';
+        progressStep.textContent = 'Uploading files...';
+        progressPercent.textContent = '0%';
+        convertBtn.disabled = true;
+        convertBtn.innerHTML = '<span class="spinner"></span> Processing...';
+
+        try {
+            // Upload
+            const uploadRes = await fetch('/api/upload', { method: 'POST', body: formData });
+            const uploadData = await uploadRes.json();
+            if (!uploadRes.ok) throw new Error(uploadData.error || 'Upload failed');
+
+            currentJobId = uploadData.job_id;
+            progressStep.textContent = 'Starting conversion...';
+            progressBar.style.width = '5%';
+            progressPercent.textContent = '5%';
+
+            // Process (this is synchronous for now)
+            const processRes = await fetch(`/api/process/${currentJobId}`, { method: 'POST' });
+            const processData = await processRes.json();
+
+            if (!processRes.ok) throw new Error(processData.error || 'Processing failed');
+
+            // Done!
+            progressBar.style.width = '100%';
+            progressBar.classList.add('done');
+            progressStep.textContent = 'Complete!';
+            progressPercent.textContent = '100%';
+
+            showResults(processData.summary, currentJobId);
+
+        } catch (err) {
+            progressBar.style.width = '100%';
+            progressBar.classList.add('error');
+            progressStep.textContent = 'Failed';
+            errorBox.textContent = err.message;
+            errorBox.classList.add('visible');
+        } finally {
+            convertBtn.disabled = false;
+            convertBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Convert to BOQ`;
+        }
+    });
+
+    function showResults(summary, jobId) {
+        const discNames = {
+            'ELECTRICAL': { label: 'Electrical', cls: 'electrical' },
+            'PLUMBING': { label: 'Plumbing', cls: 'plumbing' },
+            'HVAC': { label: 'HVAC', cls: 'hvac' },
+            'FIRE_FIGHTING': { label: 'Fire Fighting', cls: 'fire' },
+        };
+
+        let html = '';
+        for (const [key, info] of Object.entries(discNames)) {
+            const data = summary[key];
+            if (data) {
+                html += `
+                    <div class="result-card ${info.cls}">
+                        <div class="label">${info.label}</div>
+                        <div class="value">${data.line_items}</div>
+                        <div class="label" style="margin-top:4px">Line Items</div>
+                    </div>`;
+            }
+        }
+
+        if (summary.unclassified > 0) {
+            html += `
+                <div class="result-card" style="border-left:3px solid var(--gray-400)">
+                    <div class="label">Unclassified</div>
+                    <div class="value">${summary.unclassified}</div>
+                    <div class="label" style="margin-top:4px">For Review</div>
+                </div>`;
+        }
+
+        resultGrid.innerHTML = html;
+        resultSection.classList.add('visible');
+
+        downloadBtn.onclick = () => {
+            window.location.href = `/api/download/${jobId}`;
+        };
+    }
+
+    resetLink.addEventListener('click', () => {
+        if (currentJobId) {
+            fetch(`/api/cleanup/${currentJobId}`, { method: 'DELETE' }).catch(() => {});
+            currentJobId = null;
+        }
+        selectedFiles = [];
+        renderFileList();
+        progressSection.classList.remove('visible');
+        resultSection.classList.remove('visible');
+        errorBox.classList.remove('visible');
+        document.getElementById('projectName').value = '';
+        progressBar.className = 'progress-bar-fill';
+        progressBar.style.width = '0%';
+    });
+    </script>
+</body>
+</html>

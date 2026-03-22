@@ -1,0 +1,10 @@
+.git
+.claude
+.DS_Store
+__pycache__
+*.pyc
+uploads/*
+outputs/*
+*.dwg
+*.xlsx
+*.dxf

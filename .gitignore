@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.DS_Store
+uploads/
+outputs/
+*.dwg
+*.xlsx
+*.dxf
+.claude/
