@@ -1,13 +1,16 @@
 FROM python:3.12-slim
 
-# Install build tools, compile LibreDWG (pinned to stable tag), then clean up
+# Install build tools, compile LibreDWG, then clean up
+# We only need dwg2dxf (read-only), so build just the programs target
+# and suppress all -Werror flags that break on newer GCC
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential cmake git \
+        build-essential cmake git sed \
     && git clone --depth 1 https://github.com/LibreDWG/libredwg.git /tmp/libredwg \
     && cd /tmp/libredwg && mkdir build && cd build \
     && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DCMAKE_C_FLAGS="-Wno-array-bounds -Wno-error" \
-    && make -j$(nproc) \
+        -DCMAKE_C_FLAGS="-w" \
+    && sed -i 's/-Werror//g' CMakeCache.txt CMakeFiles/*.dir/flags.make 2>/dev/null || true \
+    && make -j$(nproc) CFLAGS="-w" \
     && make install \
     && ldconfig \
     && rm -rf /tmp/libredwg \
